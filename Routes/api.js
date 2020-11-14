@@ -12,7 +12,7 @@ var paymentController = require('../Controllers/Http/paymentController')
 
 const Route = Router()
 
-Route.post('/', function(req, res){
+Route.get('/', function(req, res){
     res.status(200).json("androapi")
 })
 // Auth
