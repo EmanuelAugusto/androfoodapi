@@ -12,6 +12,9 @@ var paymentController = require('../Controllers/Http/paymentController')
 
 const Route = Router()
 
+Route.post('/', function(req, res){
+    res.status(200).json("androapi")
+})
 // Auth
 Route.post('/createSalesman', AuthController.createAccountSalesman)
 Route.post('/createClient', AuthController.createAccountClient)
