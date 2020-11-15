@@ -94,7 +94,7 @@ exports.deleteFood = function (req, res) {
 exports.getFoodById = function (req, res) {
     try {
 
-        let results = mongoose.model('Food').find({ _id: req.params.id, erased: 0 }, function (error, foods) {
+        let results = mongoose.model('Food').findOne({ _id: req.params.id, erased: 0 }, function (error, foods) {
             if (error)
                 res.send(error)
 
