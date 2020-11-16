@@ -43,7 +43,7 @@ Route.post('/searchsalesman', salesmanController.searchSalesman)
 
 Route.get('/allsalesman', salesmanController.getAllSalesman)
 Route.get('/foodsbysalesman/:id',  foodController.foodBySalesman)
-
+Route.get('/salesman/:id', salesmanController.profile)
 
 
 //Routes user Authenticated
