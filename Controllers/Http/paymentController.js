@@ -70,7 +70,7 @@ exports.getPayments = async function (req, res) {
             if (error)
                 res.send(error)
 
-            res.json(payment)
+            res.json({msg: "user_logged", code: 200, payment})
         }).populate('idClient').populate('idFood').populate('idSalesman')
     } catch (error) {
         res.status(500).json(error.toString())

@@ -10,7 +10,7 @@ exports.session = function (req, res, next) {
         const tokenRequest = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null
 
         if (!tokenRequest) {
-            res.status(401).send({ message: 'invalid session1' })
+            res.status(200).send({msg: "invalid_session", code: "401"})
             return;
         }
 
@@ -20,17 +20,17 @@ exports.session = function (req, res, next) {
                 res.send(error)
 
             if (token.length) {
-                res.status(401).send({ message: 'token blacklisted' })
+                res.status(200).send({ msg: 'token_blacklisted', code: "401" })
             } else {
                 JWT.verify(tokenRequest, process.env.SECRET_KEY, (err, decoded) => {
                     if (err) {
                         console.log(err)
-                        res.status(401).send({ message: 'invalid session' })
+                        res.status(200).send({ msg: 'invalid_session', code: "401" })
                     } else {
                         req.data = decoded
 
                         if (decoded.user.typeProfile != "client") {
-                            res.status(401).send({ message: 'You are not a client' })
+                            res.status(200).send({ msg: 'not_a_client', code: "401" })
                         } else {
                             next()
                         }
@@ -42,8 +42,9 @@ exports.session = function (req, res, next) {
         })
 
     } catch (error) {
-        res.status(500).send({
-            error: "error when pass in middleware"
+        res.status(200).send({
+            msg: "error_get_token",
+            code: "500"
         })
     }
 
