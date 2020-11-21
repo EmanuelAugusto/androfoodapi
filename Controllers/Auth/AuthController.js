@@ -14,7 +14,7 @@ exports.authUserSalesman = function (req) {
         return decoded
     } catch (error) {
         res.status(500).send({
-            error: "error when get user"
+            msg: "error when get user"
         })
     }
 }
@@ -30,7 +30,7 @@ exports.createAccountSalesman = function (req, res) {
         results = mongoose.model('Salesman').find({ email: user.email }, function name(error, tutors) {
 
             if (tutors.length) {
-                res.status(400).send({ msg: "an account already exists with this registered email address" })
+                res.status(200).send({ msg: "an account already exists with this registered email address" })
             } else {
                 newUser = new mongoose.model('Salesman')(user)
 
@@ -52,7 +52,7 @@ exports.createAccountSalesman = function (req, res) {
                             expiresIn: 7200
                         })
 
-                        res.status(200).send({ dataUser })
+                        res.status(200).send({ msg: "Account Created", dataUser })
                     }
 
 
@@ -62,9 +62,8 @@ exports.createAccountSalesman = function (req, res) {
 
         })
     } catch (error) {
-        console.log(error)
         res.status(500).send({
-            error: "error when create user"
+            msg: "error when create user"
         })
     }
 
@@ -82,14 +81,14 @@ exports.createAccountClient = function(req, res){
         results = mongoose.model('Client').find({ email: user.email }, function name(error, tutors) {
 
             if (tutors.length) {
-                res.status(400).send({ msg: "an account already exists with this registered email address" })
+                res.status(200).send({ msg: "already_exists_registered_email_address", code: "400" })
             } else {
                 newUser = new mongoose.model('Client')(user)
 
                 newUser.save(function (error, newUser) {
 
                     if (error) {
-                        res.send(error)
+                        res.send({ msg: "Incomplete_data", code: "400" })
                     } else {
                         let userId = newUser._id.toString()
 
@@ -104,7 +103,7 @@ exports.createAccountClient = function(req, res){
                             expiresIn: 7200
                         })
 
-                        res.status(200).send({ dataUser })
+                        res.status(200).send({msg: "Account_Created", code: "200", dataUser })
                     }
 
 
@@ -114,9 +113,8 @@ exports.createAccountClient = function(req, res){
 
         })
     } catch (error) {
-        console.log(error)
         res.status(500).send({
-            error: "error when create user"
+            msg: "error when create user"
         })
     }
 }
@@ -160,9 +158,8 @@ exports.loginAccountSalesman = async function (req, res) {
             res.status(404).send({ msg: "User not found" })
         }
     } catch (error) {
-        console.log(error)
         res.status(500).send({
-            error: "error when create user"
+            msg: "error when create user"
         })
     }
 
@@ -193,19 +190,19 @@ exports.loginAccountClient = async function(req, res){
                     expiresIn: 7200
                 })
 
-                res.status(200).send({ token, dataUser })
+                res.status(200).send({msg: "user_logged", code: "200", token, dataUser })
 
             } else {
-                res.status(401).send({ msg: "username or password do not match" })
+                res.status(200).send({ msg: "password_do_not_match", code: "401", })
             }
 
         } else {
-            res.status(404).send({ msg: "User not found" })
+            res.status(200).send({ msg: "user_not_found", code: "404" })
         }
     } catch (error) {
-        console.log(error)
-        res.status(500).send({
-            error: "error when create user"
+        res.status(200).send({
+            msg: "error when login user",
+            code: "500"
         })
     }
 }
@@ -230,7 +227,7 @@ exports.logout = function(req, res){
 
 
     }catch(error){
-        res.status(400).send({ msg : "token not sended"})
+        res.status(200).send({ msg : "token not sended"})
     }
     
 }
