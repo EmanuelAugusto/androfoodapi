@@ -2,20 +2,36 @@ const mongoose = require('mongoose');
 const JWT = require('jsonwebtoken')
 const authController = require('../Auth/AuthController')
 var mailService = require('../../Services/mailService')
+var cieloService = require('../../Services/cieloService')
 
 
 exports.paymentFood = async function (req, res) {
-    try {
 
+    try{
         var user = authController.authUserSalesman(req)
+
+
+        let payment = {
+            nameClient: user.user.nameclient,
+            price: req.body.price,
+            cardNumberClient: req.body.cardNumberClient,
+            nameHolder: req.body.nameHolder,
+            expDate: req.body.expDate,
+            cvv: req.body.cvv
+        }
+
+
+        let responseCielo = await cieloService.cieloServicePaymentCreditCard(payment)
 
         let pay = req.body
 
-        let newPayment = new mongoose.model('ExtractBuy')(pay)
+        let newPayment = await new mongoose.model('ExtractBuy')(pay)
 
         newPayment.idClient = user.userId
         newPayment.idFood = pay.idFood
         newPayment.idSalesman = pay.idSalesman
+        newPayment.paymentId = responseCielo.payment.paymentId
+
 
         newPayment.save(async function (error, payment) {
             if (error) {
@@ -38,7 +54,10 @@ exports.paymentFood = async function (req, res) {
                 <br>
                 <strong>Data do pedido:</strong> ${payment.dataCreated}
                 <br>
-                <strong>Status:</strong> ${payment.status}`)
+                <strong>Status:</strong> ${payment.status}
+                <br>
+                <strong>Identificação do pagamento:</strong> ${payment.paymentId} 
+                <br`)
 
                 await mailService.sendMail(
                     user.user.email,
@@ -51,15 +70,34 @@ exports.paymentFood = async function (req, res) {
                     <br> 
                     <strong>Quantidade:</strong> ${payment.quantity}
                     <br>
-                    <strong>Data do pedido:</strong> ${payment.dataCreated}`)
+                    <strong>Data do pedido:</strong> ${payment.dataCreated}
+                    <br>
+                    <strong>Identificação do pagamento:</strong> ${payment.paymentId} 
+                    <br> `)
 
-                res.json(payment)
+                    res.status(200).json({msg: "payment_authorized", code: "200"})
             }
         })
-    } catch (error) {
-        res.status(500).json(error.toString())
+        
+    }catch(error){
+        res.status(200).json({msg: "payment_not_authorized", code: "400"})
     }
 
+
+
+}
+
+exports.consult = async function(req, res){
+    try {
+        var user = authController.authUserSalesman(req)
+        
+        let responseCielo = await cieloService.cieloServiceConsultPayment(req.body.paymentId)
+
+        res.status(200).json(responseCielo)
+
+    } catch (error) {
+        res.status(200).json({msg: "error_when_consult_payment", code: "400"})
+    }
 }
 
 exports.getPayments = async function (req, res) {

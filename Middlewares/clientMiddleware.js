@@ -24,7 +24,6 @@ exports.session = function (req, res, next) {
             } else {
                 JWT.verify(tokenRequest, process.env.SECRET_KEY, (err, decoded) => {
                     if (err) {
-                        console.log(err)
                         res.status(200).send({ msg: 'invalid_session', code: "401" })
                     } else {
                         req.data = decoded

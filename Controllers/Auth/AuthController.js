@@ -14,7 +14,7 @@ exports.authUserSalesman = function (req) {
         return decoded
     } catch (error) {
         res.status(500).send({
-            msg: "error when get user"
+            msg: "error_when_get_user"
         })
     }
 }
@@ -227,7 +227,46 @@ exports.logout = function(req, res){
 
 
     }catch(error){
-        res.status(200).send({ msg : "token not sended"})
+        res.status(200).send({ msg : "token_not_sended"})
     }
     
+}
+
+exports.me = async function(req, res){
+    try{
+        const token = req.headers.authorization.split(' ')[1]
+
+        await JWT.verify(token, process.env.SECRET_KEY, async (err, dataUser) => {
+            if (err) {
+              res.status(200).send({ msg : "token_not_sended", code: "401" })
+            }
+
+            let { userId } = { ...dataUser }
+
+        
+              userModel = mongoose.model('Client').findOne({ _id: userId }, function (error, user) {
+                if (error) {
+                  res.status(500).json({ error })
+                } else {
+        
+                  let userId = user._id.toString()
+        
+                  dataUser = {
+                    userId, user
+                  }
+        
+        
+                  res.status(200).json({msg: "user_logged", code: "200", dataUser })
+                }
+        
+              })
+        
+          })
+
+    }catch(error){
+        res.status(200).send({
+            msg: "error_when_get_user",
+            code: "500"
+        })
+    }
 }

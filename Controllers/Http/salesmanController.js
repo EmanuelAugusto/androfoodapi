@@ -12,7 +12,6 @@ exports.searchSalesman = function (req, res) {
             res.json(salesman)
         })
     } catch (error) {
-        console.log(error)
         res.json({ msg: "error when get salesman" })
     }
 
@@ -28,7 +27,6 @@ exports.getAllSalesman = function(req, res){
             res.json(salesman)
         })
     } catch (error) {
-        console.log(error)
         res.json({ msg: "error when get salesman" })
     }
 }
@@ -42,7 +40,6 @@ exports.profile = function(req, res){
             res.json(salesman)
         })
     } catch (error) {
-        console.log(error)
         res.json({ msg: "error when get salesman" })
     }
 }

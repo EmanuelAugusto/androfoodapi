@@ -17,6 +17,10 @@ var ExtractBuySchema = new Schema({
         ref: "Salesman",
         required: "Salesman is required"
     }],
+    paymentId:{
+        type: String,
+        default: ""
+    },
     price:{
         type: Number,
         required: "price is required"

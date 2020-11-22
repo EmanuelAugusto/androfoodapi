@@ -101,7 +101,6 @@ exports.getFoodById = function (req, res) {
             res.json(foods)
         }).populate('owner')
     } catch (error) {
-        console.log(error)
         res.json({ msg: "error when get foods" })
     }
 }
@@ -117,7 +116,6 @@ exports.searchAllfood = function (req, res) {
     
         
     } catch (error) {
-        console.log(error)
         res.json({ msg: "error when get foods" })
     }
 

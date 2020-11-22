@@ -23,7 +23,7 @@ Route.post('/loginSalesman', AuthController.loginAccountSalesman)
 Route.post('/loginClient', AuthController.loginAccountClient)
 
 // Route.get('/meSalesman',salesmanMiddleware.session, AuthController.meAccountSalesman)
-// Route.get('/meClient', clientMiddleware.session,  AuthController.meAccountClient)
+Route.get('/meClient', clientMiddleware.session,  AuthController.me)
 
 Route.post('/logout', AuthController.logout)
 
@@ -49,6 +49,7 @@ Route.get('/salesman/:id', salesmanController.profile)
 //Routes user Authenticated
 Route.post('/payment', clientMiddleware.session, paymentController.paymentFood)
 Route.get('/payments', clientMiddleware.session, paymentController.getPayments)
+Route.post('/paymentsconsult', clientMiddleware.session, paymentController.consult)
 
 Route.get('/paymentSalesman', salesmanMiddleware.session, paymentController.paymentSalesman)
 Route.put('/updatePaymentStatus/:id', salesmanMiddleware.session, paymentController.updatePaymentStatus)
