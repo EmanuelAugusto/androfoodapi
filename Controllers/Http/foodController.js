@@ -91,15 +91,13 @@ exports.deleteFood = function (req, res) {
     }
 }
 
-exports.getFoodById = function (req, res) {
+exports.getFoodById = async function (req, res) {
     try {
+        let results;
 
-        let results = mongoose.model('Food').findOne({ _id: req.params.id, erased: 0 }, function (error, foods) {
-            if (error)
-                res.send(error)
+        results = await mongoose.model('Food').findOne({ _id: req.params.id, erased: 0 }).populate('owner')
 
-            res.json(foods)
-        }).populate('owner')
+        res.status(200).json(results);
     } catch (error) {
         res.json({ msg: "error when get foods" })
     }
