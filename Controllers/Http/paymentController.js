@@ -7,7 +7,7 @@ var cieloService = require('../../Services/cieloService')
 
 exports.paymentFood = async function (req, res) {
 
-    try{
+    try {
         var user = authController.authUserSalesman(req)
 
 
@@ -75,28 +75,28 @@ exports.paymentFood = async function (req, res) {
                     <strong>Identificação do pagamento:</strong> ${payment.paymentId} 
                     <br> `)
 
-                    res.status(200).json({msg: "payment_authorized", code: "200"})
+                res.status(200).json({ msg: "payment_authorized", code: "200" })
             }
         })
-        
-    }catch(error){
-        res.status(200).json({msg: "payment_not_authorized", code: "400"})
+
+    } catch (error) {
+        res.status(200).json({ msg: "payment_not_authorized", code: "400" })
     }
 
 
 
 }
 
-exports.consult = async function(req, res){
+exports.consult = async function (req, res) {
     try {
         var user = authController.authUserSalesman(req)
-        
+
         let responseCielo = await cieloService.cieloServiceConsultPayment(req.body.paymentId)
 
         res.status(200).json(responseCielo)
 
     } catch (error) {
-        res.status(200).json({msg: "error_when_consult_payment", code: "400"})
+        res.status(200).json({ msg: "error_when_consult_payment", code: "400" })
     }
 }
 
@@ -108,7 +108,7 @@ exports.getPayments = async function (req, res) {
             if (error)
                 res.send(error)
 
-            res.json({msg: "user_logged", code: 200, payment})
+            res.json({ msg: "user_logged", code: 200, payment })
         }).populate('idClient').populate('idFood').populate('idSalesman')
     } catch (error) {
         res.status(500).json(error.toString())
@@ -140,33 +140,51 @@ exports.updatePaymentStatus = async function (req, res) {
             if (error)
                 res.send(error)
 
-            await mailService.sendMail(
-                payment.idClient[0].email,
-                'Mudança de Status no pedido', `
-                Status do Pedido: 
-                <h3><strong style="color: red;">${payment.status}</strong></h3>
-                    Pedido: 
-                    <br> 
-                    <h4><strong>${payment.idFood[0].nome}</strong></h4>
-                    <br> 
-                    <strong>Preço:</strong> ${payment.price} 
-                    <br> 
-                    <strong>Quantidade:</strong> ${payment.quantity}
-                    <br>
-                    <strong>Data do pedido:</strong> ${payment.dataCreated}`)
+            if (payment != null) {
 
-            res.json(payment)
+                if (payment.idClient[0].email != undefined || payment.idClient[0].email != '') {
+                    await mailService.sendMail(
+                        payment.idClient[0].email,
+                        'Mudança de Status no pedido', `
+                        Status do Pedido: 
+                        <h3><strong style="color: red;">${payment.status}</strong></h3>
+                            Pedido: 
+                            <br> 
+                            <h4><strong>${payment.idFood[0].nome}</strong></h4>
+                            <br> 
+                            <strong>Preço:</strong> ${payment.price} 
+                            <br> 
+                            <strong>Quantidade:</strong> ${payment.quantity}
+                            <br>
+                            <strong>Data do pedido:</strong> ${payment.dataCreated}`)
+                }
+
+
+                res.json(payment)
+            } else {
+                res.status(404).json({ msg: "request_not_found", code: "404" })
+            }
+
+
         }).populate('idClient').populate('idFood').populate('idSalesman')
     } catch (error) {
         res.status(500).json(error.toString())
     }
 }
 
-exports.getPaymentsPerStatus = async function(req, res){
+exports.getPaymentsPerStatus = async function (req, res) {
     try {
         var user = authController.authUserSalesman(req)
 
-        let results = mongoose.model('ExtractBuy').find({ idSalesman: user.userId, status: req.body.status }, null, { sort: { '_id': -1 } }, function (error, payment) {
+        let idSearch;
+
+        if (user.user.typeProfile == "client") {
+            idSearch = 'idClient'
+        } else {
+            idSearch = 'idSalesman'
+        }
+
+        let results = mongoose.model('ExtractBuy').find({ [idSearch]: user.userId }, null, { sort: { '_id': -1 } }, function (error, payment) {
             if (error)
                 res.send(error)
 

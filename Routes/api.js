@@ -53,8 +53,8 @@ Route.post('/paymentsconsult', clientMiddleware.session, paymentController.consu
 
 Route.get('/paymentSalesman', salesmanMiddleware.session, paymentController.paymentSalesman)
 Route.put('/updatePaymentStatus/:id', salesmanMiddleware.session, paymentController.updatePaymentStatus)
-Route.get('/getPaymentsPerStatus', salesmanMiddleware.session, paymentController.getPaymentsPerStatus)
-
+Route.post('/getPaymentsPerStatusSalesman', salesmanMiddleware.session, paymentController.getPaymentsPerStatus)
+Route.post('/getPaymentsPerStatusClient', clientMiddleware.session, paymentController.getPaymentsPerStatus)
 
 module.exports = Route
 

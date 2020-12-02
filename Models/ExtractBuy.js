@@ -36,9 +36,9 @@ var ExtractBuySchema = new Schema({
     status:{
         type: [{
             type: String,
-            enum: ['processing', 'paidout', "attended"]
+            enum: ['Processando', 'Pago', "Atendido"]
         }],
-        default: "processing"
+        default: "Processando"
     }
 })
 
