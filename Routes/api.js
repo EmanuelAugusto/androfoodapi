@@ -24,7 +24,6 @@ Route.post('/loginClient', AuthController.loginAccountClient)
 
 Route.put('/editProfileClient', clientMiddleware.session, AuthController.editProfileClient);
 
-// Route.get('/meSalesman',salesmanMiddleware.session, AuthController.meAccountSalesman)
 Route.get('/meClient', clientMiddleware.session,  AuthController.me)
 
 Route.post('/logout', AuthController.logout)
