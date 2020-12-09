@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 var mailService = require('../../Services/mailService')
+var auth = require('./AuthController')
 
 exports.authUserSalesman = function (req) {
     try {
@@ -70,8 +71,8 @@ exports.createAccountSalesman = function (req, res) {
 }
 
 
-exports.createAccountClient = function(req, res){
-    
+exports.createAccountClient = function (req, res) {
+
     try {
         let user = req.body
 
@@ -103,7 +104,7 @@ exports.createAccountClient = function(req, res){
                             expiresIn: 7200
                         })
 
-                        res.status(200).send({msg: "Account_Created", code: "200", dataUser })
+                        res.status(200).send({ msg: "Account_Created", code: "200", dataUser })
                     }
 
 
@@ -165,7 +166,7 @@ exports.loginAccountSalesman = async function (req, res) {
 
 }
 
-exports.loginAccountClient = async function(req, res){
+exports.loginAccountClient = async function (req, res) {
     try {
         const { email, passwordUser } = req.body;
 
@@ -190,7 +191,7 @@ exports.loginAccountClient = async function(req, res){
                     expiresIn: 7200
                 })
 
-                res.status(200).send({msg: "user_logged", code: "200", token, dataUser })
+                res.status(200).send({ msg: "user_logged", code: "200", token, dataUser })
 
             } else {
                 res.status(200).send({ msg: "password_do_not_match", code: "401", })
@@ -207,65 +208,113 @@ exports.loginAccountClient = async function(req, res){
     }
 }
 
-exports.logout = function(req, res){
+exports.logout = function (req, res) {
 
-    try{
+    try {
         const token = req.headers.authorization.split(' ')[1]
-        
+
         let tokenUser = {
             token
         }
 
         let newBlacklistToken = new mongoose.model('Token')(tokenUser)
 
-        newBlacklistToken.save(function(error, token){
-            if(error)
+        newBlacklistToken.save(function (error, token) {
+            if (error)
                 res.send(error)
-    
-            res.json({msg: "logout sucess"})
-        }) 
+
+            res.json({ msg: "logout sucess" })
+        })
 
 
-    }catch(error){
-        res.status(200).send({ msg : "token_not_sended"})
+    } catch (error) {
+        res.status(200).send({ msg: "token_not_sended" })
     }
-    
+
 }
 
-exports.me = async function(req, res){
-    try{
+exports.me = async function (req, res) {
+    try {
         const token = req.headers.authorization.split(' ')[1]
 
         await JWT.verify(token, process.env.SECRET_KEY, async (err, dataUser) => {
             if (err) {
-              res.status(200).send({ msg : "token_not_sended", code: "401" })
+                res.status(200).send({ msg: "token_not_sended", code: "401" })
             }
 
             let { userId } = { ...dataUser }
 
-        
-              userModel = mongoose.model('Client').findOne({ _id: userId }, function (error, user) {
-                if (error) {
-                  res.status(500).json({ error })
-                } else {
-        
-                  let userId = user._id.toString()
-        
-                  dataUser = {
-                    userId, user
-                  }
-        
-        
-                  res.status(200).json({msg: "user_logged", code: "200", dataUser })
-                }
-        
-              })
-        
-          })
 
-    }catch(error){
+            userModel = mongoose.model('Client').findOne({ _id: userId }, function (error, user) {
+                if (error) {
+                    res.status(500).json({ error })
+                } else {
+
+                    let userId = user._id.toString()
+
+                    dataUser = {
+                        userId, user
+                    }
+
+
+                    res.status(200).json({ msg: "user_logged", code: "200", dataUser })
+                }
+
+            })
+
+        })
+
+    } catch (error) {
         res.status(200).send({
             msg: "error_when_get_user",
+            code: "500"
+        })
+    }
+}
+
+exports.editProfileClient = async function (req, res) {
+    try {
+
+        let user = auth.authUserSalesman(req)
+
+        let dataUser;
+
+        if(req.body.password){
+            dataUser = {
+                nameclient: req.body.nameclient,
+                email: req.body.nameclient,
+                cpf: req.body.cpf,
+                address: req.body.address,
+                password: req.body.password
+            }
+        }else{
+            dataUser = {
+                nameclient: req.body.nameclient,
+                email: req.body.nameclient,
+                cpf: req.body.cpf,
+                address: req.body.address
+            }
+        }
+
+
+        await mongoose.model('Client').findOneAndUpdate({ _id: user.userId },
+            dataUser,
+            function (error, user) {
+                if (error)
+                    res.send(error)
+
+                res.status(200).send({
+                    msg: "success_update_user",
+                    code: "200"
+                })
+            })
+
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(200).send({
+            msg: "error_when_update_user",
             code: "500"
         })
     }
